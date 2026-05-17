@@ -98,6 +98,9 @@ def interactive_menu():
         # 1. PREPARE & SPLIT DATASET
         # =====================================================================
         if choice == "1":
+            print("\nAvailable datasets in current directory:")
+            list_files(".txt")
+
             raw_file = input("\nDataset path to split: ").strip()
             output_dir = input("Output directory for splits: ").strip()
             ensure_dir(output_dir)
@@ -126,6 +129,7 @@ def interactive_menu():
         # 2. TRAIN NETWORK
         # =====================================================================
         elif choice == "2":
+            print("\nRemember to provide the path to your split file (e.g., output/train_split.txt)")
             train_file = input("\nProvide TRAIN dataset path (e.g., output/train_split.txt): ").strip()
             output_dir = input("Output directory for logs: ").strip()
             ensure_dir(output_dir)
@@ -174,6 +178,9 @@ def interactive_menu():
         # 3. TEST NETWORK (Wybór modelu i zestawu testowego)
         # =====================================================================
         elif choice == "3":
+            print("\nAvailable saved models in current directory:")
+            list_files(".pkl")
+
             model_path = input("\nPath to saved model file (e.g., models/my_model.txt): ").strip()
             test_file = input("Path to TEST dataset (e.g., output/test_split.txt): ").strip()
             output_dir = input("Output directory for test results: ").strip()
@@ -186,7 +193,6 @@ def interactive_menu():
             try:
                 print("\nLoading model...")
                 net = load_object(model_path)
-                list_files(net)
 
                 print(f"Testing model '{model_path}' on dataset '{test_file}'...\n")
                 net.test(
