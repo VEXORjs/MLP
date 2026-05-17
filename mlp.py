@@ -510,8 +510,8 @@ class MLP:
         print("\nTEST FINISHED")
         print(f"Accuracy: {accuracy:.4f}")
 
+    @staticmethod
     def save_confusion_matrix(
-            self,
             matrix,
             output_dir
     ):
@@ -528,6 +528,7 @@ class MLP:
             for row in matrix:
                 writer.writerow(row)
 
+    @staticmethod
     def plot_errors(
             self,
             epochs,
@@ -566,6 +567,7 @@ class MLP:
 
         plt.close()
 
+    @staticmethod
     def plot_accuracy(
             self,
             epochs,

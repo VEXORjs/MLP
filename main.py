@@ -235,7 +235,7 @@ def cli():
         action="store_true"
     )
 
-    args = parser.parse_args()
+    parser.parse_args()
 
     interactive_menu()
 
