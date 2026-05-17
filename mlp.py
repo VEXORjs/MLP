@@ -530,7 +530,6 @@ class MLP:
 
     @staticmethod
     def plot_errors(
-            self,
             epochs,
             errors,
             output_dir
@@ -569,7 +568,6 @@ class MLP:
 
     @staticmethod
     def plot_accuracy(
-            self,
             epochs,
             accuracy,
             output_dir

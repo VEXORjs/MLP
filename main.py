@@ -1,6 +1,5 @@
 import argparse
 import os
-import pickle
 
 import autoencoder
 from mlp import MLP
@@ -10,21 +9,6 @@ from dataset import DatasetLoader
 # =============================================================================
 # MENU HELPERS
 # =============================================================================
-
-def save_object(obj, filename):
-    with open(filename, 'wb') as f:
-        pickle.dump(obj, f)
-        print("Object saved -> ", filename)
-
-def load_object(filename):
-    with open(filename, 'rb') as f:
-        return pickle.load(f)
-
-def list_files(extension):
-    files = [f for f in os.listdir(".") if f.endswith(extension)]
-    if not files:
-        print("No files found with extension -> ", extension, "in this directory")
-    return files
 
 def build_architecture_from_user():
     print("\n=== NETWORK ARCHITECTURE ===")
@@ -99,7 +83,6 @@ def interactive_menu():
         # =====================================================================
         if choice == "1":
             print("\nAvailable datasets in current directory:")
-            list_files(".txt")
 
             raw_file = input("\nDataset path to split: ").strip()
             output_dir = input("Output directory for splits: ").strip()
@@ -171,15 +154,18 @@ def interactive_menu():
             if save_model:
                 model_path = input("Model save path (example: models/my_model.txt): ").strip()
                 ensure_dir(os.path.dirname(model_path) if os.path.dirname(model_path) else ".")
-                save_object(net, model_path)
-                print(f"Model saved to: {model_path}")
+
+                net.save_model(model_path)
+                absulute_path = os.path.abspath(model_path) if model_path else None
+
+                print(f"-> Trained model saved to relative path: {model_path}")
+                print(f"[SUCCESS] Trained model saved to absolute path: {absulute_path}")
 
         # =====================================================================
         # 3. TEST NETWORK (Wybór modelu i zestawu testowego)
         # =====================================================================
         elif choice == "3":
             print("\nAvailable saved models in current directory:")
-            list_files(".pkl")
 
             model_path = input("\nPath to saved model file (e.g., models/my_model.txt): ").strip()
             test_file = input("Path to TEST dataset (e.g., output/test_split.txt): ").strip()
@@ -192,7 +178,7 @@ def interactive_menu():
             # 2. Odtworzenie modelu z pliku
             try:
                 print("\nLoading model...")
-                net = load_object(model_path)
+                net = MLP.load_model(model_path)
 
                 print(f"Testing model '{model_path}' on dataset '{test_file}'...\n")
                 net.test(

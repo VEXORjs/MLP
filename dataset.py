@@ -19,7 +19,7 @@ class DatasetLoader:
         class_map = {}
         class_counter = 0
 
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, "r") as f:
 
             for line in f:
 
@@ -64,8 +64,8 @@ class DatasetLoader:
                     left = split[0].strip()
                     right = split[1].strip()
 
-                    x = [float(v.strip()) for v in left.split(",")]
-                    y = [float(v.strip()) for v in right.split(",")]
+                    x = [v.strip() for v in left.split(",")]
+                    y = [v.strip() for v in right.split(",")]
 
                     X.append(x)
                     Y.append(y)
