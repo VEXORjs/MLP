@@ -1,5 +1,6 @@
 import argparse
 import os
+import pickle
 
 import autoencoder
 from mlp import MLP
@@ -9,6 +10,21 @@ from dataset import DatasetLoader
 # =============================================================================
 # MENU HELPERS
 # =============================================================================
+
+def save_object(obj, filename):
+    with open(filename, 'wb') as f:
+        pickle.dump(obj, f)
+        print("Object saved -> ", filename)
+
+def load_object(filename):
+    with open(filename, 'rb') as f:
+        return pickle.load(f)
+
+def list_files(extension):
+    files = [f for f in os.listdir(".") if f.endswith(extension)]
+    if not files:
+        print("No files found with extension -> ", extension, "in this directory")
+    return files
 
 def build_architecture_from_user():
     print("\n=== NETWORK ARCHITECTURE ===")
@@ -66,118 +82,67 @@ def build_architecture_from_user():
 # =============================================================================
 
 def interactive_menu():
-
     while True:
-
         print("\n" + "=" * 80)
         print("MLP FRAMEWORK")
         print("=" * 80)
-
-        print("1. Train network")
-        print("2. Test network")
-        print("3. Autoencoder study")
-        print("4. Exit")
+        print("1. Prepare & Split dataset (Train/Test split)")
+        print("2. Train network (Using training dataset)")
+        print("3. Test network (Choose model & test dataset)")
+        print("4. Autoencoder study")
+        print("5. Exit")
 
         choice = input("\nChoice: ").strip()
 
         # =====================================================================
-        # TRAIN
+        # 1. PREPARE & SPLIT DATASET
         # =====================================================================
         if choice == "1":
-
-            train_file = input(
-                "\nDataset path: "
-            ).strip()
-
-            output_dir = input(
-                "Output directory: "
-            ).strip()
-
+            raw_file = input("\nDataset path to split: ").strip()
+            output_dir = input("Output directory for splits: ").strip()
             ensure_dir(output_dir)
 
-            dataset = DatasetLoader.load_txt_dataset(
-                train_file
-            )
-
+            # Ładowanie i normalizacja
+            dataset = DatasetLoader.load_txt_dataset(raw_file)
             DatasetLoader.normalize_minmax(dataset)
 
-            train_dataset, test_dataset = (
-                DatasetLoader.stratified_split(
-                    dataset,
-                    train_ratio=0.8
-                )
+            # Podział
+            train_dataset, test_dataset = DatasetLoader.stratified_split(
+                dataset, train_ratio=0.8
             )
 
-            DatasetLoader.save_dataset(
-                train_dataset,
-                os.path.join(
-                    output_dir,
-                    "train_split.txt"
-                )
-            )
+            # Zapis osobnych plików na dysk
+            train_path = os.path.join(output_dir, "train_split.txt")
+            test_path = os.path.join(output_dir, "test_split.txt")
 
-            DatasetLoader.save_dataset(
-                test_dataset,
-                os.path.join(
-                    output_dir,
-                    "test_split.txt"
-                )
-            )
+            DatasetLoader.save_dataset(train_dataset, train_path)
+            DatasetLoader.save_dataset(test_dataset, test_path)
 
+            print(f"\n[SUCCESS] Datasets split successfully!")
+            print(f"-> Train split saved to: {train_path}")
+            print(f"-> Test split saved to: {test_path}")
+
+        # =====================================================================
+        # 2. TRAIN NETWORK
+        # =====================================================================
+        elif choice == "2":
+            train_file = input("\nProvide TRAIN dataset path (e.g., output/train_split.txt): ").strip()
+            output_dir = input("Output directory for logs: ").strip()
+            ensure_dir(output_dir)
+
+            # Ładowanie wyłącznie zbioru treningowego
+            train_dataset = DatasetLoader.load_txt_dataset(train_file)
+
+            # Konfiguracja sieci
             layers = build_architecture_from_user()
 
-            lr = float(input(
-                "\nLearning rate "
-                "(recommended 0.1-0.6)\n"
-                "Lower = slower but more stable\n"
-                "Higher = faster but may diverge\n"
-                "Value: "
-            ))
-
-            momentum = float(input(
-                "\nMomentum "
-                "(recommended 0.0-0.9)\n"
-                "Higher may accelerate learning\n"
-                "Too high may destabilize training\n"
-                "Value: "
-            ))
-
-            epochs = int(input(
-                "\nEpochs "
-                "(recommended 1000-10000)\n"
-                "Higher = potentially better accuracy\n"
-                "but slower training\n"
-                "Value: "
-            ))
-
-            target_error = float(input(
-                "\nTarget error "
-                "(recommended 0.001): "
-            ))
-
-            bias = (
-                input(
-                    "\nUse bias? (y/n): "
-                )
-                .lower()
-                .startswith("y")
-            )
-
-            use_momentum = (
-                input(
-                    "Use momentum? (y/n): "
-                )
-                .lower()
-                .startswith("y")
-            )
-
-            shuffle = (
-                input(
-                    "Shuffle every epoch? (y/n): "
-                )
-                .lower()
-                .startswith("y")
-            )
+            lr = float(input("\nLearning rate (recommended 0.1-0.6): "))
+            momentum = float(input("\nMomentum (recommended 0.0-0.9): "))
+            epochs = int(input("\nEpochs (recommended 1000-10000): "))
+            target_error = float(input("\nTarget error (recommended 0.001): "))
+            bias = input("\nUse bias? (y/n): ").lower().startswith("y")
+            use_momentum = input("Use momentum? (y/n): ").lower().startswith("y")
+            shuffle = input("Shuffle every epoch? (y/n): ").lower().startswith("y")
 
             net = MLP(
                 layers=layers,
@@ -187,6 +152,8 @@ def interactive_menu():
                 use_momentum=use_momentum
             )
 
+            # Trenowanie na zbiorze treningowym
+            print("\nStarting training...")
             net.train(
                 train_dataset,
                 epochs=epochs,
@@ -195,72 +162,45 @@ def interactive_menu():
                 output_dir=output_dir
             )
 
-            print("\nTesting on test dataset...\n")
-
-            net.test(
-                test_dataset,
-                output_dir=output_dir
-            )
-            save_model = (
-                input(
-                    "\nSave model? (y/n): "
-                )
-                .lower()
-                .startswith("y")
-            )
+            # Opcjonalne zapisanie modelu po treningu
+            save_model = input("\nSave trained model? (y/n): ").lower().startswith("y")
             if save_model:
-
-                model_path = input(
-                    "Model save path "
-                    "(example: models/model.txt): "
-                ).strip()
-
-                ensure_dir(
-                    os.path.dirname(model_path)
-                    if os.path.dirname(model_path)
-                    else "."
-                )
-
-                net.save_model(model_path)
-
-                print(
-                    f"Model saved to: "
-                    f"{model_path}"
-                )
+                model_path = input("Model save path (example: models/my_model.txt): ").strip()
+                ensure_dir(os.path.dirname(model_path) if os.path.dirname(model_path) else ".")
+                save_object(net, model_path)
+                print(f"Model saved to: {model_path}")
 
         # =====================================================================
-        # TEST SECTION
-        # =====================================================================
-        elif choice == "2":
-            model_path = input(
-                "\nModel path: "
-            ).strip()
-
-            test_file = input(
-                "Test dataset path: "
-            ).strip()
-
-            output_dir = input(
-                "Output directory: "
-            ).strip()
-
-            dataset = DatasetLoader.load_txt_dataset(
-                test_file
-            )
-
-            DatasetLoader.normalize_minmax(dataset)
-
-            net = MLP.load_model(model_path)
-
-            net.test(
-                dataset,
-                output_dir=output_dir
-            )
-
-        # =====================================================================
-        # AUTOENCODER
+        # 3. TEST NETWORK (Wybór modelu i zestawu testowego)
         # =====================================================================
         elif choice == "3":
+            model_path = input("\nPath to saved model file (e.g., models/my_model.txt): ").strip()
+            test_file = input("Path to TEST dataset (e.g., output/test_split.txt): ").strip()
+            output_dir = input("Output directory for test results: ").strip()
+            ensure_dir(output_dir)
+
+            # 1. Wczytanie zbioru testowego
+            test_dataset = DatasetLoader.load_txt_dataset(test_file)
+
+            # 2. Odtworzenie modelu z pliku
+            try:
+                print("\nLoading model...")
+                net = load_object(model_path)
+                list_files(net)
+
+                print(f"Testing model '{model_path}' on dataset '{test_file}'...\n")
+                net.test(
+                    test_dataset,
+                    output_dir=output_dir
+                )
+                print("[SUCCESS] Testing completed. Results saved in output directory.")
+            except Exception as e:
+                print(f"[ERROR] Could not load or test the model: {e}")
+
+        # =====================================================================
+        # 4. AUTOENCODER STUDY
+        # =====================================================================
+        elif choice == "4":
 
             output_dir = input(
                 "\nOutput directory: "
@@ -271,14 +211,14 @@ def interactive_menu():
             )
 
         # =====================================================================
-        # EXIT
+        # 5. EXIT
         # =====================================================================
-        elif choice == "4":
+        elif choice == "5":
+            print("\nExiting MLP Framework. Goodbye!")
             break
+
         else:
-            print("\nInvalid choice.")
-
-
+            print("\n[WARNING] Invalid choice! Please select a number between 1 and 5.")
 # =============================================================================
 # CLI
 # =============================================================================

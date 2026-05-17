@@ -77,7 +77,6 @@ class MLP:
                 effective_input_size = input_size + 1
 
             else:
-
                 current_with_bias = current
                 effective_input_size = input_size
 
@@ -100,11 +99,12 @@ class MLP:
 
         return current
 
+    # noinspection PyTypeChecker
     def backward(self, targets):
 
         self.deltas = [None] * len(self.layers)
 
-        output_layer = len(self.layers) - 1
+        output_layer= len(self.layers) - 1
 
         output_deltas = []
 
