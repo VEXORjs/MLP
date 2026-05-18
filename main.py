@@ -6,11 +6,14 @@ from mlp import MLP
 from utilities import ensure_dir
 from dataset import DatasetLoader
 
+<<<<<<< HEAD
 DEFAULT_LOG_DIR = "log"
 DEFAULT_DATA_DIR = "data"
 DEFAULT_MODEL_DIR = "models"
 DEFAULT_RESULTS_DIR = "results"
 
+=======
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
 # =============================================================================
 # MENU HELPERS
 # =============================================================================
@@ -83,10 +86,17 @@ def interactive_menu():
 
         choice = input("\nChoice: ").strip()
 
+<<<<<<< HEAD
+=======
+        # =====================================================================
+        # 1. PREPARE & SPLIT DATASET
+        # =====================================================================
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
         if choice == "1":
             print("\nAvailable datasets in current directory:")
 
             raw_file = input("\nDataset path to split: ").strip()
+<<<<<<< HEAD
             output_dir = input(
                 f"Output directory for splits [{DEFAULT_DATA_DIR}]: "
             ).strip()
@@ -94,10 +104,14 @@ def interactive_menu():
             if not output_dir:
                 output_dir = DEFAULT_DATA_DIR
 
+=======
+            output_dir = input("Output directory for splits: ").strip()
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
             ensure_dir(output_dir)
 
             # Ładowanie i normalizacja
             dataset = DatasetLoader.load_txt_dataset(raw_file)
+<<<<<<< HEAD
 
             train_dataset, test_dataset = DatasetLoader.stratified_split(
                 dataset,
@@ -109,6 +123,15 @@ def interactive_menu():
             DatasetLoader.apply_minmax(train_dataset, mins, maxs)
             DatasetLoader.apply_minmax(test_dataset, mins, maxs)
 
+=======
+            DatasetLoader.normalize_minmax(dataset)
+
+            # Podział
+            train_dataset, test_dataset = DatasetLoader.stratified_split(
+                dataset, train_ratio=0.8
+            )
+
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
             # Zapis osobnych plików na dysk
             train_path = os.path.join(output_dir, "train_split.txt")
             test_path = os.path.join(output_dir, "test_split.txt")
@@ -120,6 +143,7 @@ def interactive_menu():
             print(f"-> Train split saved to: {train_path}")
             print(f"-> Test split saved to: {test_path}")
 
+<<<<<<< HEAD
         elif choice == "2":
             print("\nRemember to provide the path to your split file (e.g., output/train_split.txt)")
             train_file = input("\nProvide TRAIN dataset path (e.g., output/train_split.txt): ").strip()
@@ -129,6 +153,15 @@ def interactive_menu():
 
             if not output_dir:
                 output_dir = DEFAULT_LOG_DIR
+=======
+        # =====================================================================
+        # 2. TRAIN NETWORK
+        # =====================================================================
+        elif choice == "2":
+            print("\nRemember to provide the path to your split file (e.g., output/train_split.txt)")
+            train_file = input("\nProvide TRAIN dataset path (e.g., output/train_split.txt): ").strip()
+            output_dir = input("Output directory for logs: ").strip()
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
             ensure_dir(output_dir)
 
             # Ładowanie wyłącznie zbioru treningowego
@@ -137,6 +170,7 @@ def interactive_menu():
             # Konfiguracja sieci
             layers = build_architecture_from_user()
 
+<<<<<<< HEAD
             lr = float(input(
                 "\nLearning rate (recommended 0.1-0.6): "
             ))
@@ -167,6 +201,15 @@ def interactive_menu():
             shuffle = input(
                 "Shuffle every epoch? (y/n): "
             ).lower().startswith("y")
+=======
+            lr = float(input("\nLearning rate (recommended 0.1-0.6): "))
+            momentum = float(input("\nMomentum (recommended 0.0-0.9): "))
+            epochs = int(input("\nEpochs (recommended 1000-10000): "))
+            target_error = float(input("\nTarget error (recommended 0.001): "))
+            bias = input("\nUse bias? (y/n): ").lower().startswith("y")
+            use_momentum = input("Use momentum? (y/n): ").lower().startswith("y")
+            shuffle = input("Shuffle every epoch? (y/n): ").lower().startswith("y")
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
 
             net = MLP(
                 layers=layers,
@@ -176,7 +219,11 @@ def interactive_menu():
                 use_momentum=use_momentum
             )
 
+<<<<<<< HEAD
             # Trenowanie na zbiorze treningowyym
+=======
+            # Trenowanie na zbiorze treningowym
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
             print("\nStarting training...")
             net.train(
                 train_dataset,
@@ -186,6 +233,7 @@ def interactive_menu():
                 output_dir=output_dir
             )
 
+<<<<<<< HEAD
             save_model = input("\nSave trained model? (y/n): ").lower().startswith("y")
             if save_model:
                 model_path = input(
@@ -206,17 +254,38 @@ def interactive_menu():
                 print(f"-> Trained model saved to relative path: {model_path}")
                 print(f"[SUCCESS] Trained model saved to absolute path: {absolute_path}")
 
+=======
+            # Opcjonalne zapisanie modelu po treningu
+            save_model = input("\nSave trained model? (y/n): ").lower().startswith("y")
+            if save_model:
+                model_path = input("Model save path (example: models/my_model.txt): ").strip()
+                ensure_dir(os.path.dirname(model_path) if os.path.dirname(model_path) else ".")
+
+                net.save_model(model_path)
+                absulute_path = os.path.abspath(model_path) if model_path else None
+
+                print(f"-> Trained model saved to relative path: {model_path}")
+                print(f"[SUCCESS] Trained model saved to absolute path: {absulute_path}")
+
+        # =====================================================================
+        # 3. TEST NETWORK (Wybór modelu i zestawu testowego)
+        # =====================================================================
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
         elif choice == "3":
             print("\nAvailable saved models in current directory:")
 
             model_path = input("\nPath to saved model file (e.g., models/my_model.txt): ").strip()
             test_file = input("Path to TEST dataset (e.g., output/test_split.txt): ").strip()
+<<<<<<< HEAD
             output_dir = input(
                 f"Output directory for test results [{DEFAULT_RESULTS_DIR}]: "
             ).strip()
 
             if not output_dir:
                 output_dir = DEFAULT_RESULTS_DIR
+=======
+            output_dir = input("Output directory for test results: ").strip()
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
             ensure_dir(output_dir)
 
             # 1. Wczytanie zbioru testowego
@@ -236,6 +305,12 @@ def interactive_menu():
             except Exception as e:
                 print(f"[ERROR] Could not load or test the model: {e}")
 
+<<<<<<< HEAD
+=======
+        # =====================================================================
+        # 4. AUTOENCODER STUDY
+        # =====================================================================
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
         elif choice == "4":
 
             output_dir = input(
@@ -265,7 +340,11 @@ def cli():
         action="store_true"
     )
 
+<<<<<<< HEAD
     args = parser.parse_args()
+=======
+    parser.parse_args()
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
 
     interactive_menu()
 

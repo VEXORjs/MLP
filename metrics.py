@@ -7,9 +7,12 @@ class Metrics:
     @staticmethod
     def accuracy(y_true, y_pred):
 
+<<<<<<< HEAD
         if len(y_true) == 0:
             return 0.0
 
+=======
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
         correct = 0
 
         for t, p in zip(y_true, y_pred):
@@ -68,6 +71,7 @@ class Metrics:
             recall.append(r)
             f1.append(f)
 
+<<<<<<< HEAD
         return precision, recall, f1
 
     @staticmethod
@@ -100,3 +104,6 @@ class Metrics:
 
             for row in matrix:
                 writer.writerow(row)
+=======
+        return precision, recall, f1
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
