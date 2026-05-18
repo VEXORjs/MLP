@@ -1,0 +1,42 @@
+================================================================================
+MLP TEST REPORT
+================================================================================
+
+Architecture: [4, 2, 4]
+Learning rate: 0.2
+Momentum: 0.9
+Bias: True
+Accuracy: 1.0
+Epoch target reached: 1522
+
+CONFUSION MATRIX
+[1, 0, 0, 0]
+[0, 1, 0, 0]
+[0, 0, 1, 0]
+[0, 0, 0, 1]
+
+CLASS METRICS
+
+CLASS 0
+Accuracy: 1.0
+Precision: 1.0
+Recall: 1.0
+F1: 1.0
+
+CLASS 1
+Accuracy: 1.0
+Precision: 1.0
+Recall: 1.0
+F1: 1.0
+
+CLASS 2
+Accuracy: 1.0
+Precision: 1.0
+Recall: 1.0
+F1: 1.0
+
+CLASS 3
+Accuracy: 1.0
+Precision: 1.0
+Recall: 1.0
+F1: 1.0
