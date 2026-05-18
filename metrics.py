@@ -7,6 +7,12 @@ class Metrics:
     @staticmethod
     def accuracy(y_true, y_pred):
 
+<<<<<<< HEAD
+        if len(y_true) == 0:
+            return 0.0
+
+=======
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
         correct = 0
 
         for t, p in zip(y_true, y_pred):
@@ -65,4 +71,39 @@ class Metrics:
             recall.append(r)
             f1.append(f)
 
+<<<<<<< HEAD
         return precision, recall, f1
+
+    @staticmethod
+    def per_class_accuracy(conf_matrix):
+
+        results = []
+
+        for i, row in enumerate(conf_matrix):
+
+            correct = row[i]
+            total = sum(row)
+
+            acc = correct / total if total > 0 else 0.0
+
+            results.append(acc)
+
+        return results
+
+    @staticmethod
+    def save_confusion_matrix(matrix, output_dir, filename="confusion_matrix.csv"):
+
+        import csv
+        import os
+
+        path = os.path.join(output_dir, filename)
+
+        with open(path, "w", newline="", encoding="utf-8") as f:
+
+            writer = csv.writer(f)
+
+            for row in matrix:
+                writer.writerow(row)
+=======
+        return precision, recall, f1
+>>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
