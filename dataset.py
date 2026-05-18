@@ -10,29 +10,19 @@ class Dataset:
     Y: list
     labels: list | None = None
 
-<<<<<<< HEAD
 
 class DatasetLoader:
 
     @staticmethod
     def load_txt_dataset(path):
 
-=======
-class DatasetLoader:
-    @staticmethod
-    def load_txt_dataset(path):
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
         X = []
         Y = []
 
         class_map = {}
         class_counter = 0
 
-<<<<<<< HEAD
         with open(path, "r", encoding="utf-8") as f:
-=======
-        with open(path, "r") as f:
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
 
             for line in f:
 
@@ -46,13 +36,6 @@ class DatasetLoader:
 
                 parts = [p.strip() for p in line.split(",")]
 
-<<<<<<< HEAD
-=======
-                # ==========================================================
-                # IRIS STYLE
-                # ==========================================================
-
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
                 if len(parts) >= 2 and "->" not in line:
 
                     features = list(map(float, parts[:-1]))
@@ -66,13 +49,6 @@ class DatasetLoader:
                     X.append(features)
                     Y.append(class_name)
 
-<<<<<<< HEAD
-=======
-                # ==========================================================
-                # GENERIC STYLE
-                # ==========================================================
-
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
                 else:
 
                     split = line.split("->")
@@ -83,23 +59,12 @@ class DatasetLoader:
                     left = split[0].strip()
                     right = split[1].strip()
 
-<<<<<<< HEAD
                     x = list(map(float, map(str.strip, left.split(","))))
                     y = list(map(float, map(str.strip, right.split(","))))
-=======
-                    x = [v.strip() for v in left.split(",")]
-                    y = [v.strip() for v in right.split(",")]
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
 
                     X.append(x)
                     Y.append(y)
 
-<<<<<<< HEAD
-=======
-        # ==============================================================
-        # ONE HOT
-        # ==============================================================
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
         if len(Y) > 0 and isinstance(Y[0], str):
 
             num_classes = len(class_map)
@@ -109,10 +74,6 @@ class DatasetLoader:
             for label in Y:
 
                 vec = [0.0] * num_classes
-<<<<<<< HEAD
-=======
-
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
                 vec[class_map[label]] = 1.0
 
                 Y_encoded.append(vec)
@@ -122,26 +83,6 @@ class DatasetLoader:
         return Dataset(X, Y)
 
     @staticmethod
-<<<<<<< HEAD
-=======
-    def normalize_minmax(dataset: Dataset):
-
-        X = np.array(dataset.X, dtype=float)
-
-        mins = X.min(axis=0)
-        maxs = X.max(axis=0)
-
-        denom = maxs - mins
-        denom[denom == 0.0] = 1.0
-
-        Xn = (X - mins) / denom
-
-        dataset.X = Xn.tolist()
-
-        return mins, maxs
-
-    @staticmethod
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
     def stratified_split(dataset, train_ratio=0.8, seed=42):
 
         random.seed(seed)
@@ -157,16 +98,8 @@ class DatasetLoader:
 
             class_groups[cls].append((x, y))
 
-<<<<<<< HEAD
         train_X, train_Y = [], []
         test_X, test_Y = [], []
-=======
-        train_X = []
-        train_Y = []
-
-        test_X = []
-        test_Y = []
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
 
         for cls in class_groups:
 
@@ -187,14 +120,7 @@ class DatasetLoader:
                 test_X.append(x)
                 test_Y.append(y)
 
-<<<<<<< HEAD
         return Dataset(train_X, train_Y), Dataset(test_X, test_Y)
-=======
-        return (
-            Dataset(train_X, train_Y),
-            Dataset(test_X, test_Y)
-        )
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
 
     @staticmethod
     def save_dataset(dataset, path):
@@ -203,7 +129,6 @@ class DatasetLoader:
 
             for x, y in zip(dataset.X, dataset.Y):
 
-<<<<<<< HEAD
                 left = ",".join(map(str, x))
                 right = ",".join(map(str, y))
 
@@ -230,9 +155,3 @@ class DatasetLoader:
         Xn = (X - mins) / denom
 
         dataset.X = Xn.tolist()
-=======
-                f.write(
-                    f"{x} -> {y}\n"
-                )
-
->>>>>>> 8eb92a82eb1b591f0a4c472e860caf397df2b086
